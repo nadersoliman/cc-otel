@@ -1,0 +1,112 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "Success / Failure / Rejection",
+      "type": "piechart",
+      "gridPos": { "h": 10, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "success" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "failure" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "rejection" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["percent"] }, "reduceOptions": { "calcs": ["sum"] }, "pieType": "donut" },
+      "targets": [
+        { "expr": "sum (count_over_time({service_name=~\"$service_name\"} | event_name = `tool_result` | success = `true` [$__range]))", "legendFormat": "success", "instant": true },
+        { "expr": "sum (count_over_time({service_name=~\"$service_name\"} | event_name = `tool_result` | success = `false` [$__range]))", "legendFormat": "failure", "instant": true },
+        { "expr": "sum (count_over_time({service_name=~\"$service_name\"} | event_name = `tool_decision` | decision = `reject` [$__range]))", "legendFormat": "rejection", "instant": true }
+      ]
+    },
+    {
+      "title": "Tool Execution per Hour",
+      "type": "barchart",
+      "gridPos": { "h": 10, "w": 18, "x": 6, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "fillOpacity": 80 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "success" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "failure" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "rejection" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
+      "targets": [
+        { "expr": "sum (count_over_time({service_name=~\"$service_name\"} | event_name = `tool_result` | success = `true` [1h]))", "legendFormat": "success" },
+        { "expr": "sum (count_over_time({service_name=~\"$service_name\"} | event_name = `tool_result` | success = `false` [1h]))", "legendFormat": "failure" },
+        { "expr": "sum (count_over_time({service_name=~\"$service_name\"} | event_name = `tool_decision` | decision = `reject` [1h]))", "legendFormat": "rejection" }
+      ],
+      "interval": "1h"
+    },
+    {
+      "title": "Tool Results",
+      "type": "logs",
+      "gridPos": { "h": 15, "w": 24, "x": 0, "y": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "options": { "showTime": true, "showLabels": true, "showCommonLabels": false, "wrapLogMessage": true, "enableLogDetails": true },
+      "targets": [
+        { "expr": "{service_name=~\"$service_name\"} | event_name = `tool_result` | success =~ `$tool_status`", "legendFormat": "" }
+      ]
+    },
+    {
+      "title": "Tool Rejections",
+      "type": "logs",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 25 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "options": { "showTime": true, "showLabels": true, "showCommonLabels": false, "wrapLogMessage": true, "enableLogDetails": true },
+      "targets": [
+        { "expr": "{service_name=~\"$service_name\"} | event_name = `tool_decision` | decision = `reject`", "legendFormat": "" }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["claude-code", "otel"],
+  "templating": {
+    "list": [
+      {
+        "name": "service_name",
+        "type": "query",
+        "label": "Service",
+        "datasource": { "type": "loki", "uid": "loki" },
+        "query": { "label": "service_name", "stream": "", "type": 1 },
+        "includeAll": true,
+        "allValue": ".+",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "multi": true,
+        "refresh": 2
+      },
+      {
+        "name": "tool_status",
+        "type": "custom",
+        "label": "Status",
+        "query": "All : .+,Success : true,Failure : false",
+        "current": { "selected": true, "text": "All", "value": ".+" },
+        "options": [
+          { "text": "All", "value": ".+", "selected": true },
+          { "text": "Success", "value": "true", "selected": false },
+          { "text": "Failure", "value": "false", "selected": false }
+        ],
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Claude Code - Tool Usage",
+  "uid": "claude-code-tool-usage",
+  "version": 7
+}

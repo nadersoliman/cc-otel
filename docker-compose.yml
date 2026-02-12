@@ -1,0 +1,113 @@
+name: cc-otel
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.144.0
+    container_name: cc-otel-otel-collector
+    ports:
+      - "4320:4317"   # OTel Collector gRPC
+      - "4321:4318"   # OTel Collector HTTP
+      - "13133:13133" # OTel Collector health check
+    command:
+      - --config=/etc/otelcol-contrib/config.yaml
+      - --feature-gates=service.profilesSupport
+    volumes:
+      - ./otelcol-config.yaml:/etc/otelcol-contrib/config.yaml
+    healthcheck:
+      disable: true
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_started
+      tempo:
+        condition: service_started
+      pyroscope:
+        condition: service_started
+
+  prometheus:
+    image: prom/prometheus:v3.9.1
+    container_name: cc-otel-prometheus
+    ports:
+      - "9092:9090"
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-remote-write-receiver
+      - --web.enable-otlp-receiver
+      - --enable-feature=memory-snapshot-on-shutdown,created-timestamp-zero-ingestion
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  loki:
+    image: grafana/loki:3.6.4
+    container_name: cc-otel-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/loki
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+
+  tempo:
+    image: grafana/tempo:2.10.0
+    container_name: cc-otel-tempo
+    volumes:
+      - tempo-data:/var/tempo
+      - ./tempo/tempo-config.yaml:/etc/tempo/config.yaml
+    command:
+      - -config.file=/etc/tempo/config.yaml
+
+  pyroscope:
+    image: grafana/pyroscope:1.18.0
+    container_name: cc-otel-pyroscope
+    ports:
+      - "4040:4040"
+    volumes:
+      - pyroscope-data:/data/pyroscope
+      - ./pyroscope/pyroscope-config.yaml:/etc/pyroscope/config.yaml
+    command:
+      - --config.file=/etc/pyroscope/config.yaml
+
+  grafana:
+    image: grafana/grafana:12.3.1
+    container_name: cc-otel-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./dashboards/claude-code-dashboards.yaml:/etc/grafana/provisioning/dashboards/claude-code-dashboards.yaml
+      - ./dashboards/claude-code-api-requests.json:/etc/grafana/provisioning/dashboards/claude-code-api-requests.json
+      - ./dashboards/claude-code-tool-usage.json:/etc/grafana/provisioning/dashboards/claude-code-tool-usage.json
+      - ./dashboards/claude-code-tokens.json:/etc/grafana/provisioning/dashboards/claude-code-tokens.json
+      - ./dashboards/claude-code-costs.json:/etc/grafana/provisioning/dashboards/claude-code-costs.json
+      - ./dashboards/claude-code-api-errors.json:/etc/grafana/provisioning/dashboards/claude-code-api-errors.json
+      - ./dashboards/claude-code-log-explorer.json:/etc/grafana/provisioning/dashboards/claude-code-log-explorer.json
+      - ./dashboards/claude-code-activity.json:/etc/grafana/provisioning/dashboards/claude-code-activity.json
+      - ./dashboards/otel-collector.json:/etc/grafana/provisioning/dashboards/otel-collector.json
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_started
+      tempo:
+        condition: service_started
+
+volumes:
+  prometheus-data:
+  loki-data:
+  tempo-data:
+  pyroscope-data:
+  grafana-data:

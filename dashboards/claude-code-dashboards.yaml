@@ -1,0 +1,51 @@
+apiVersion: 1
+
+providers:
+  - name: "Claude Code - API Requests"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-api-requests.json
+      foldersFromFilesStructure: false
+  - name: "Claude Code - Tool Usage"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-tool-usage.json
+      foldersFromFilesStructure: false
+  - name: "Claude Code - Tokens"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-tokens.json
+      foldersFromFilesStructure: false
+  - name: "Claude Code - Costs"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-costs.json
+      foldersFromFilesStructure: false
+  - name: "Claude Code - API Errors"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-api-errors.json
+      foldersFromFilesStructure: false
+  - name: "Claude Code - Log Explorer"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-log-explorer.json
+      foldersFromFilesStructure: false
+  - name: "Claude Code - Activity"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-activity.json
+      foldersFromFilesStructure: false
+  - name: "OTel Collector"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/otel-collector.json
+      foldersFromFilesStructure: false

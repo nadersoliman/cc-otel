@@ -1,0 +1,8 @@
+# Docker volumes (if extracted locally)
+*-data/
+
+# Compiled binaries
+hooks/otel_trace_hook
+
+# OS
+.DS_Store
