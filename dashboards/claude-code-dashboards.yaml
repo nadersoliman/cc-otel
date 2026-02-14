@@ -25,6 +25,12 @@ providers:
     options:
       path: /etc/grafana/provisioning/dashboards/claude-code-costs.json
       foldersFromFilesStructure: false
+  - name: "Claude Code - Costs (Prometheus)"
+    type: file
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards/claude-code-costs-prometheus.json
+      foldersFromFilesStructure: false
   - name: "Claude Code - API Errors"
     type: file
     updateIntervalSeconds: 10

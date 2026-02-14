@@ -90,6 +90,7 @@ services:
       - ./dashboards/claude-code-tool-usage.json:/etc/grafana/provisioning/dashboards/claude-code-tool-usage.json
       - ./dashboards/claude-code-tokens.json:/etc/grafana/provisioning/dashboards/claude-code-tokens.json
       - ./dashboards/claude-code-costs.json:/etc/grafana/provisioning/dashboards/claude-code-costs.json
+      - ./dashboards/claude-code-costs-prometheus.json:/etc/grafana/provisioning/dashboards/claude-code-costs-prometheus.json
       - ./dashboards/claude-code-api-errors.json:/etc/grafana/provisioning/dashboards/claude-code-api-errors.json
       - ./dashboards/claude-code-log-explorer.json:/etc/grafana/provisioning/dashboards/claude-code-log-explorer.json
       - ./dashboards/claude-code-activity.json:/etc/grafana/provisioning/dashboards/claude-code-activity.json

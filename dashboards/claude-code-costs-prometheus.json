@@ -1,0 +1,127 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "Total Cost",
+      "type": "stat",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "orange", "value": 5 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "expr": "sum(increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[$__range]))", "legendFormat": "Total", "instant": true, "refId": "A" }
+      ]
+    },
+    {
+      "title": "Cost by Model",
+      "type": "piechart",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        { "expr": "sum by (model) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[$__range]))", "legendFormat": "{{model}}", "instant": true, "refId": "A" }
+      ]
+    },
+    {
+      "title": "Cost by Service",
+      "type": "piechart",
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        { "expr": "sum by (job) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[$__range]))", "legendFormat": "{{job}}", "instant": true, "refId": "A" }
+      ]
+    },
+    {
+      "title": "Cost per Hour by Model",
+      "type": "barchart",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
+      "targets": [
+        { "expr": "sum by (model) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[1h]))", "legendFormat": "{{model}}", "refId": "A" }
+      ],
+      "interval": "1h"
+    },
+    {
+      "title": "Cost per Hour by Service",
+      "type": "barchart",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
+      "targets": [
+        { "expr": "sum by (job) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[1h]))", "legendFormat": "{{job}}", "refId": "A" }
+      ],
+      "interval": "1h"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["claude-code", "otel", "cost", "prometheus"],
+  "templating": {
+    "list": [
+      {
+        "name": "service_name",
+        "type": "query",
+        "label": "Service",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(claude_code_cost_usage_USD_total, job)",
+        "includeAll": true,
+        "allValue": ".+",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "multi": true,
+        "refresh": 2
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Claude Code - Costs (Prometheus)",
+  "uid": "claude-code-costs-prometheus",
+  "version": 1
+}
