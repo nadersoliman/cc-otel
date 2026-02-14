@@ -1,7 +1,12 @@
-# Plan: CI Quality Gates for cc-otel
+---
+adr: "0001"
+title: "CI Quality Gates"
+status: "proposed"
+date: "2026-02-14"
+author: "Claude Opus 4.6"
+---
 
-**Status:** Proposed
-**Date:** 2026-02-14
+# ADR-0001: CI Quality Gates
 
 ## Problem
 
