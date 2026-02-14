@@ -112,7 +112,8 @@ Also included but not shown: **API Requests**, **API Errors**, **Tool Usage**, a
 | `tempo/` | Tempo config (`tempo-config.yaml`) |
 | `pyroscope/` | Pyroscope config (`pyroscope-config.yaml`) |
 | `hooks/` | OTel trace hook -- bridges Claude Code hook events to Tempo traces |
-| `docs/` | Deep dives, experiments, and migration plans |
+| `scripts/` | Development tools: pre-commit quality gate checks |
+| `docs/` | Deep dives, experiments, ADRs, and migration plans |
 | `CLAUDE.md` | Full technical reference (architecture, telemetry schema, known issues) |
 
 ## What Claude Code Emits
@@ -122,6 +123,16 @@ Also included but not shown: **API Requests**, **API Errors**, **Tool Usage**, a
 **5 log event types** (Loki): `user_prompt`, `tool_result`, `api_request`, `api_error`, `tool_decision`.
 
 See [CLAUDE.md](CLAUDE.md) for the full telemetry schema, Prometheus name mappings, and attribute details.
+
+## Development Setup
+
+After cloning, install the pre-commit hook to enable Tier 1 quality gates (JSON/YAML validation, Docker Compose checks, version pinning):
+
+```bash
+cd scripts/pre-commit && make install
+```
+
+The hook runs automatically on every `git commit` and blocks commits that introduce invalid configs or unpinned versions.
 
 ## Useful Commands
 

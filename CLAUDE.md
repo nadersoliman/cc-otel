@@ -111,7 +111,8 @@ Each subdirectory has its own `CLAUDE.md` with deeper context relevant to that c
 | `loki/` | Config file, how logs arrive (two sources), storage/schema details |
 | `tempo/` | Config file, trace storage setup (receives spans from the OTel trace hook) |
 | `pyroscope/` | Config file, profiling storage (inactive -- kept for exploration) |
-| `docs/` | Investigation notes, deep dives, and links to `experiments/` and `plans/` subdirectories |
+| `scripts/` | Development tools (pre-commit hook). See `scripts/pre-commit/CLAUDE.md` |
+| `docs/` | Investigation notes, deep dives, ADRs, and links to `experiments/`, `plans/`, and `adr/` subdirectories |
 
 ## Key Conventions
 
@@ -161,6 +162,16 @@ CLAUDE_CODE_ENABLE_TELEMETRY=1 OTEL_METRICS_EXPORTER=console OTEL_LOGS_EXPORTER=
 ```
 
 See `prometheus/CLAUDE.md` and `loki/CLAUDE.md` for curl query examples against each backend.
+
+## Pre-commit Hook
+
+A Go-based pre-commit hook validates every commit. Install after cloning:
+
+```bash
+cd scripts/pre-commit && make install
+```
+
+Checks: JSON validation, YAML validation, Docker Compose syntax, version pinning (no floating Docker tags, no unpinned Go direct deps).
 
 ## Git Conventions
 
