@@ -6,19 +6,20 @@
   "links": [],
   "panels": [
     {
-      "title": "Total Requests",
+      "title": "Total Cost",
       "type": "stat",
       "gridPos": { "h": 7, "w": 8, "x": 0, "y": 0 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
+          "unit": "currencyUSD",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "blue", "value": 100 },
-              { "color": "purple", "value": 500 }
+              { "color": "yellow", "value": 1 },
+              { "color": "orange", "value": 5 },
+              { "color": "red", "value": 10 }
             ]
           }
         },
@@ -26,16 +27,16 @@
       },
       "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "targets": [
-        { "expr": "sum(count_over_time({service_name=~\"$service_name\"} | event_name = `api_request` [$__range]))", "legendFormat": "Total", "queryType": "instant", "refId": "A" }
+        { "expr": "sum(increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[$__range]))", "legendFormat": "Total", "instant": true, "refId": "A" }
       ]
     },
     {
-      "title": "Requests by Service",
+      "title": "Cost by Model",
       "type": "piechart",
       "gridPos": { "h": 7, "w": 8, "x": 8, "y": 0 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "unit": "short", "color": { "mode": "palette-classic" } },
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" } },
         "overrides": []
       },
       "options": {
@@ -45,16 +46,16 @@
         "tooltip": { "mode": "single" }
       },
       "targets": [
-        { "expr": "sum by (service_name) (count_over_time({service_name=~\"$service_name\"} | event_name = `api_request` [$__range]))", "legendFormat": "{{service_name}}", "refId": "A" }
+        { "expr": "sum by (model) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[$__range]))", "legendFormat": "{{model}}", "instant": true, "refId": "A" }
       ]
     },
     {
-      "title": "Requests by Model",
+      "title": "Cost by Service",
       "type": "piechart",
       "gridPos": { "h": 7, "w": 8, "x": 16, "y": 0 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "unit": "short", "color": { "mode": "palette-classic" } },
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" } },
         "overrides": []
       },
       "options": {
@@ -64,65 +65,51 @@
         "tooltip": { "mode": "single" }
       },
       "targets": [
-        { "expr": "sum by (model) (count_over_time({service_name=~\"$service_name\"} | event_name = `api_request` [$__range]))", "legendFormat": "{{model}}", "refId": "A" }
+        { "expr": "sum by (job) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[$__range]))", "legendFormat": "{{job}}", "instant": true, "refId": "A" }
       ]
     },
     {
-      "title": "Request Rate per Hour by Service",
+      "title": "Cost per Hour by Model",
       "type": "barchart",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 7 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "unit": "short", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
         "overrides": []
       },
       "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
       "targets": [
-        { "expr": "sum by (service_name) (count_over_time({service_name=~\"$service_name\"} | event_name = `api_request` [1h]))", "legendFormat": "{{service_name}}", "refId": "A" }
+        { "expr": "sum by (model) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[1h]))", "legendFormat": "{{model}}", "refId": "A" }
       ],
       "interval": "1h"
     },
     {
-      "title": "API Request Rate by Model",
+      "title": "Cost per Hour by Service",
       "type": "barchart",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 17 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": { "mode": "palette-classic" },
-          "custom": { "fillOpacity": 80 }
-        },
+        "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
         "overrides": []
       },
       "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
       "targets": [
-        { "expr": "sum by (model) (count_over_time({service_name=~\"$service_name\"} | event_name = `api_request` [1h]))", "legendFormat": "{{model}}" }
+        { "expr": "sum by (job) (increase(claude_code_cost_usage_USD_total{job=~\"$service_name\"}[1h]))", "legendFormat": "{{job}}", "refId": "A" }
       ],
       "interval": "1h"
-    },
-    {
-      "title": "API Requests",
-      "type": "logs",
-      "gridPos": { "h": 20, "w": 24, "x": 0, "y": 27 },
-      "datasource": { "type": "loki", "uid": "loki" },
-      "options": { "showTime": true, "showLabels": true, "showCommonLabels": false, "wrapLogMessage": true, "enableLogDetails": true },
-      "targets": [
-        { "expr": "{service_name=~\"$service_name\"} | event_name = `api_request`", "legendFormat": "" }
-      ]
     }
   ],
-  "refresh": "10s",
+  "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["claude-code", "otel"],
+  "tags": ["claude-code", "otel", "cost", "prometheus"],
   "templating": {
     "list": [
       {
         "name": "service_name",
         "type": "query",
         "label": "Service",
-        "datasource": { "type": "loki", "uid": "loki" },
-        "query": { "label": "service_name", "stream": "", "type": 1 },
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(claude_code_cost_usage_USD_total, job)",
         "includeAll": true,
         "allValue": ".+",
         "current": { "selected": true, "text": "All", "value": "$__all" },
@@ -134,7 +121,7 @@
   "time": { "from": "now-24h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Claude Code - API Requests",
-  "uid": "claude-code-api-requests",
-  "version": 4
+  "title": "Claude Code - Costs (Prometheus)",
+  "uid": "claude-code-costs-prometheus",
+  "version": 1
 }
