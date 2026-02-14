@@ -8,7 +8,7 @@
     {
       "title": "API Error Rate by Status Code",
       "type": "barchart",
-      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 17 },
       "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
@@ -27,7 +27,7 @@
     {
       "title": "API Error Rate by Model",
       "type": "barchart",
-      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 17 },
       "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": {
         "defaults": {
@@ -44,13 +44,91 @@
       "interval": "1h"
     },
     {
+      "title": "Total Errors",
+      "type": "stat",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "orange", "value": 20 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "expr": "sum(count_over_time({service_name=~\"$service_name\"} | event_name = `api_error` [$__range]))", "legendFormat": "Total", "queryType": "instant", "refId": "A" }
+      ]
+    },
+    {
+      "title": "Errors by Service",
+      "type": "piechart",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        { "expr": "sum by (service_name) (count_over_time({service_name=~\"$service_name\"} | event_name = `api_error` [$__range]))", "legendFormat": "{{service_name}}", "refId": "A" }
+      ]
+    },
+    {
+      "title": "Errors by Model",
+      "type": "piechart",
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        { "expr": "sum by (model) (count_over_time({service_name=~\"$service_name\"} | event_name = `api_error` [$__range]))", "legendFormat": "{{model}}", "refId": "A" }
+      ]
+    },
+    {
+      "title": "Error Rate per Hour by Service",
+      "type": "barchart",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 7 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
+      "targets": [
+        { "expr": "sum by (service_name) (count_over_time({service_name=~\"$service_name\"} | event_name = `api_error` [1h]))", "legendFormat": "{{service_name}}", "refId": "A" }
+      ],
+      "interval": "1h"
+    },
+    {
       "title": "API Errors",
       "type": "logs",
-      "gridPos": { "h": 20, "w": 24, "x": 0, "y": 10 },
+      "gridPos": { "h": 20, "w": 24, "x": 0, "y": 27 },
       "datasource": { "type": "loki", "uid": "loki" },
       "options": { "showTime": true, "showLabels": true, "showCommonLabels": false, "wrapLogMessage": true, "enableLogDetails": true },
       "targets": [
-        { "expr": "{service_name=~\"$service_name\"} | event_name = `api_error`", "legendFormat": "" }
+        { "expr": "{service_name=~\"$service_name\"} | event_name = `api_error` | line_format \"{{.error}}\"", "legendFormat": "" }
       ]
     }
   ],
