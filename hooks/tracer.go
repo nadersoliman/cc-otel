@@ -12,10 +12,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 // traceIDFromSession generates a deterministic trace ID from a session ID.
@@ -27,18 +24,16 @@ func traceIDFromSession(sessionID string) trace.TraceID {
 }
 
 // initTracer sets up the OTel TracerProvider with OTLP gRPC exporter.
-func initTracer(endpoint, serviceName string) (func(), error) {
+//
+// All configuration is read from standard OTel environment variables:
+//   - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT or OTEL_EXPORTER_OTLP_ENDPOINT (default: http://localhost:4317)
+//   - OTEL_SERVICE_NAME (default: unknown_service)
+//   - OTEL_RESOURCE_ATTRIBUTES (default: none)
+func initTracer() (func(), error) {
 	ctx := context.Background()
 
-	conn, err := grpc.NewClient(endpoint,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("grpc dial: %w", err)
-	}
-
 	exporter, err := otlptracegrpc.New(ctx,
-		otlptracegrpc.WithGRPCConn(conn),
+		otlptracegrpc.WithInsecure(),
 		otlptracegrpc.WithTimeout(5*time.Second),
 	)
 	if err != nil {
@@ -46,8 +41,8 @@ func initTracer(endpoint, serviceName string) (func(), error) {
 	}
 
 	res, err := resource.New(ctx,
+		resource.WithFromEnv(),
 		resource.WithAttributes(
-			semconv.ServiceNameKey.String(serviceName),
 			attribute.String("hook.version", "0.1.0"),
 		),
 	)
