@@ -42,8 +42,12 @@ Session Root
 
 ## Environment Variables
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `CC_OTEL_TRACE_ENDPOINT` | `localhost:4320` | Collector gRPC endpoint |
-| `CC_OTEL_TRACE_SERVICE_NAME` | `claude-code-hooks` | `service.name` attribute |
-| `CC_OTEL_TRACE_DEBUG` | `false` | Debug logging to `~/.claude/state/otel_trace_hook.log` |
+All configuration follows the [OTel environment variable specification](https://opentelemetry.io/docs/languages/sdk-configuration/). The Go SDK reads these automatically.
+
+| Variable | OTel Spec Default | Purpose |
+|----------|-------------------|---------|
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | (falls back to `OTEL_EXPORTER_OTLP_ENDPOINT`, then `http://localhost:4317`) | Collector gRPC endpoint for traces |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | Base OTLP endpoint (used if traces-specific var is not set) |
+| `OTEL_SERVICE_NAME` | `unknown_service` | `service.name` resource attribute |
+| `OTEL_RESOURCE_ATTRIBUTES` | (none) | Comma-separated `key=value` pairs added to the trace resource (e.g., `project.name=cc-otel`) |
+| `CC_OTEL_TRACE_DEBUG` | `false` | Debug logging to `~/.claude/state/otel_trace_hook.log` (only non-standard var) |

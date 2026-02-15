@@ -120,15 +120,6 @@ func handlePostToolUse(input HookInput) {
 func handleStop(input HookInput) {
 	start := time.Now()
 
-	endpoint := os.Getenv("CC_OTEL_TRACE_ENDPOINT")
-	if endpoint == "" {
-		endpoint = "localhost:4320"
-	}
-	serviceName := os.Getenv("CC_OTEL_TRACE_SERVICE_NAME")
-	if serviceName == "" {
-		serviceName = "claude-code-ccotel"
-	}
-
 	// Find transcript path from input or state.
 	transcriptPath := input.TranscriptPath
 	sessionID := input.SessionID
@@ -176,7 +167,7 @@ func handleStop(input HookInput) {
 	}
 
 	// Init OTel and export.
-	shutdown, err := initTracer(endpoint, serviceName)
+	shutdown, err := initTracer()
 	if err != nil {
 		logMsg("ERROR", fmt.Sprintf("Failed to init tracer: %v", err))
 		return
@@ -196,5 +187,5 @@ func handleStop(input HookInput) {
 	}
 
 	duration := time.Since(start).Seconds()
-	logMsg("INFO", fmt.Sprintf("Exported %d turns in %.1fs to %s", len(turns), duration, endpoint))
+	logMsg("INFO", fmt.Sprintf("Exported %d turns in %.1fs", len(turns), duration))
 }

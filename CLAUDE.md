@@ -111,7 +111,8 @@ Each subdirectory has its own `CLAUDE.md` with deeper context relevant to that c
 | `loki/` | Config file, how logs arrive (two sources), storage/schema details |
 | `tempo/` | Config file, trace storage setup (receives spans from the OTel trace hook) |
 | `pyroscope/` | Config file, profiling storage (inactive -- kept for exploration) |
-| `docs/` | Investigation notes, deep dives, and links to `experiments/` and `plans/` subdirectories |
+| `scripts/` | Development tools (pre-commit hook). See `scripts/pre-commit/CLAUDE.md` |
+| `docs/` | Investigation notes, deep dives, ADRs, and links to `experiments/`, `plans/`, and `adr/` subdirectories |
 
 ## Key Conventions
 
@@ -134,7 +135,7 @@ Cost and token dashboards use Loki `sum_over_time(unwrap)` on `api_request` log 
 
 ## Critical Gotchas
 
-- **OTel env vars must be in the shell profile, not `settings.json`** -- The OTel SDK initializes before `settings.json` is parsed. All `OTEL_*` and `CLAUDE_CODE_ENABLE_TELEMETRY` vars must be in the shell environment (e.g., `~/.zshrc`, `~/.bashrc`).
+- **OTel env vars go in `settings.json`** -- Set all `OTEL_*` and `CLAUDE_CODE_ENABLE_TELEMETRY` vars in the `env` block of `~/.claude/settings.json` (global) or `.claude/settings.json` (per-project). Shell exports also work but `settings.json` is preferred for reproducibility.
 - **Collector SDK endpoint path** -- The `service.telemetry.logs.processors` OTLP exporter does NOT auto-append `/v1/logs`. You must specify `http://loki:3100/otlp/v1/logs`. Using just `/otlp` results in a silent 404.
 - **Tool failure telemetry is partial** -- Only tools that execute and fail emit `tool_result` with `success=false`. Pre-execution validation failures don't produce OTel events.
 
@@ -161,6 +162,16 @@ CLAUDE_CODE_ENABLE_TELEMETRY=1 OTEL_METRICS_EXPORTER=console OTEL_LOGS_EXPORTER=
 ```
 
 See `prometheus/CLAUDE.md` and `loki/CLAUDE.md` for curl query examples against each backend.
+
+## Pre-commit Hook
+
+A Go-based pre-commit hook validates every commit. Install after cloning:
+
+```bash
+cd scripts/pre-commit && make install
+```
+
+Checks: JSON validation, YAML validation, Docker Compose syntax, version pinning (no floating Docker tags, no unpinned Go direct deps).
 
 ## Git Conventions
 

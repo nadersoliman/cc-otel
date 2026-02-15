@@ -12,5 +12,6 @@ Documentation and investigation notes for the observability stack. See root `CLA
 
 ## Subdirectories
 
+- `adr/` -- Architecture Decision Records, numbered sequentially (`0001-*.md`). See `adr/CLAUDE.md`.
 - `experiments/` -- Empirical dashboard query experiments. See `experiments/CLAUDE.md`.
 - `plans/` -- Implementation plans for completed features. See `plans/CLAUDE.md`.
