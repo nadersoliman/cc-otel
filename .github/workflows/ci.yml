@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tier1-lint:
+    name: "Tier 1 — Static Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: scripts/pre-commit/go.mod
+
+      - name: Build Tier 1 checks
+        run: cd scripts/pre-commit && go build -o tier1-checks .
+
+      - name: Run Tier 1 checks
+        run: scripts/pre-commit/tier1-checks

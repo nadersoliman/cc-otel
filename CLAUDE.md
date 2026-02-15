@@ -135,7 +135,7 @@ Cost and token dashboards use Loki `sum_over_time(unwrap)` on `api_request` log 
 
 ## Critical Gotchas
 
-- **OTel env vars must be in the shell profile, not `settings.json`** -- The OTel SDK initializes before `settings.json` is parsed. All `OTEL_*` and `CLAUDE_CODE_ENABLE_TELEMETRY` vars must be in the shell environment (e.g., `~/.zshrc`, `~/.bashrc`).
+- **OTel env vars go in `settings.json`** -- Set all `OTEL_*` and `CLAUDE_CODE_ENABLE_TELEMETRY` vars in the `env` block of `~/.claude/settings.json` (global) or `.claude/settings.json` (per-project). Shell exports also work but `settings.json` is preferred for reproducibility.
 - **Collector SDK endpoint path** -- The `service.telemetry.logs.processors` OTLP exporter does NOT auto-append `/v1/logs`. You must specify `http://loki:3100/otlp/v1/logs`. Using just `/otlp` results in a silent 404.
 - **Tool failure telemetry is partial** -- Only tools that execute and fail emit `tool_result` with `success=false`. Pre-execution validation failures don't produce OTel events.
 
