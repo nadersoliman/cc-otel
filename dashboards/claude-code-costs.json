@@ -77,7 +77,7 @@
         "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
         "overrides": []
       },
-      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": 0, "xTickLabelMaxLength": 0, "xTickLabelSpacing": 300 },
       "targets": [
         { "expr": "sum by (model) (sum_over_time({service_name=~\"$service_name\"} | event_name = `api_request` | unwrap cost_usd | __error__=\"\" [1h]))", "legendFormat": "{{model}}", "refId": "A" }
       ],
@@ -92,7 +92,7 @@
         "defaults": { "unit": "currencyUSD", "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 80 } },
         "overrides": []
       },
-      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": -45 },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] }, "barWidth": 0.8, "stacking": "normal", "xTickLabelRotation": 0, "xTickLabelMaxLength": 0, "xTickLabelSpacing": 300 },
       "targets": [
         { "expr": "sum by (service_name) (sum_over_time({service_name=~\"$service_name\"} | event_name = `api_request` | unwrap cost_usd | __error__=\"\" [1h]))", "legendFormat": "{{service_name}}", "refId": "A" }
       ],
