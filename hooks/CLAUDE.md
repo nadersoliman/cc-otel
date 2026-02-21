@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-OTel trace hook for Claude Code. Bridges hook lifecycle events to OpenTelemetry traces exported to the collector (gRPC on `localhost:4320`).
+OTel trace hook for Claude Code. Bridges hook lifecycle events to OpenTelemetry traces exported to the collector (gRPC on `localhost:4317` via port-forward).
 
 ## Build & Install
 
@@ -47,7 +47,7 @@ All configuration follows the [OTel environment variable specification](https://
 | Variable | OTel Spec Default | Purpose |
 |----------|-------------------|---------|
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | (falls back to `OTEL_EXPORTER_OTLP_ENDPOINT`, then `http://localhost:4317`) | Collector gRPC endpoint for traces |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | Base OTLP endpoint (used if traces-specific var is not set) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | Base OTLP endpoint (use port-forward if traces-specific var is not set) |
 | `OTEL_SERVICE_NAME` | `unknown_service` | `service.name` resource attribute |
-| `OTEL_RESOURCE_ATTRIBUTES` | (none) | Comma-separated `key=value` pairs added to the trace resource (e.g., `project.name=cc-otel`) |
+| `OTEL_RESOURCE_ATTRIBUTES` | (none) | Comma-separated `key=value` pairs added to the trace resource (e.g., `project.name=k8s-lab`) |
 | `CC_OTEL_TRACE_DEBUG` | `false` | Debug logging to `~/.claude/state/otel_trace_hook.log` (only non-standard var) |

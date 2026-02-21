@@ -303,7 +303,7 @@ Only tools that **executed and returned an error** emit `tool_result` with `succ
 
 ### The Problem
 
-Claude Code emits **Delta temporality** counters (each data point is an increment like "+$0.05"). Prometheus only accepts **Cumulative temporality** (running totals like "$0.05", "$0.10", "$0.15"). We used the `deltatocumulative` processor in the OTel Collector to bridge this, but it introduced several issues:
+Claude Code emits **Delta temporality** counters (each data point is an increment like "+\$0.05"). Prometheus only accepts **Cumulative temporality** (running totals like "\$0.05", "\$0.10", "\$0.15"). We used the `deltatocumulative` processor in the OTel Collector to bridge this, but it introduced several issues:
 
 1. **Stale metrics**: The processor evicts series from memory after `max_stale` (default 5m). Once evicted, the counter resets to zero — losing historical totals.
 2. **OOM crash**: Setting `max_stale: 30m` caused the collector to crash silently (container showed "Up" but OTLP ports stopped responding).

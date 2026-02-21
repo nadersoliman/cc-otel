@@ -146,7 +146,7 @@ Error appending remote write: invalid temporality and type combination
 for metric "claude_code.cost.usage"
 ```
 
-**Root cause**: Claude Code's OTel SDK defaults to **Delta temporality** (each data point is an increment: "+$0.05"). Prometheus only accepts **Cumulative temporality** (running totals: "$0.05", "$0.10", "$0.15").
+**Root cause**: Claude Code's OTel SDK defaults to **Delta temporality** (each data point is an increment: "+\$0.05"). Prometheus only accepts **Cumulative temporality** (running totals: "\$0.05", "\$0.10", "\$0.15").
 
 **First fix — deltatocumulative processor**: Added the OTel Collector's `deltatocumulative` processor to convert Delta → Cumulative in-flight. This worked initially but caused:
 - **OOM crash**: With `max_stale: 30m`, the collector silently died. High-cardinality attributes created thousands of streams, each retained for 30 minutes.
@@ -197,12 +197,12 @@ This tells Claude Code's OTel SDK to maintain running totals in-process. No `del
 
 ## Experiment 10: Phantom $532/Hour — Counter Resets from WAL Interleaving
 
-**Symptom**: The "Cost per Hour by Service" bar chart showed $532 every hour from 12:00-15:00, even though no sessions were active. Total showed $2,760 (actual was ~$42).
+**Symptom**: The "Cost per Hour by Service" bar chart showed \$532 every hour from 12:00-15:00, even though no sessions were active. Total showed \$2,760 (actual was ~\$42).
 
 **Query**: `sum by (service_name) (increase(claude_code_cost_usage_USD_total{...}[1h]))`
 
 **Investigation**:
-1. Raw counter values were flat at $5.38 during idle hours — `increase()` should return $0
+1. Raw counter values were flat at \$5.38 during idle hours — `increase()` should return \$0
 2. `resets(counter[1h])` at 10:00 UTC returned **60** — sixty counter resets in a single hour
 3. At 10-second resolution, the counter was **oscillating** between two values every minute:
 

@@ -12,7 +12,7 @@ type HookInput struct {
 	// PostToolUse fields
 	ToolName     string                 `json:"tool_name,omitempty"`
 	ToolInput    map[string]interface{} `json:"tool_input,omitempty"`
-	ToolResponse map[string]interface{} `json:"tool_response,omitempty"`
+	ToolResponse interface{}             `json:"tool_response,omitempty"`
 	ToolUseID    string                 `json:"tool_use_id,omitempty"`
 }
 
@@ -21,7 +21,7 @@ type ToolSpanData struct {
 	ToolName     string                 `json:"tool_name"`
 	ToolUseID    string                 `json:"tool_use_id"`
 	ToolInput    map[string]interface{} `json:"tool_input,omitempty"`
-	ToolResponse map[string]interface{} `json:"tool_response,omitempty"`
+	ToolResponse interface{}            `json:"tool_response,omitempty"`
 	Timestamp    time.Time              `json:"timestamp"`
 }
 
