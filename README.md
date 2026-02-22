@@ -10,7 +10,7 @@ Claude Code  --OTLP-->  OTel Collector  ---->  Prometheus (metrics)
                                          |-->  Tempo (traces)
                                          |-->  Pyroscope (profiling, future)
                                                |
-OTel Trace Hook  --OTLP/gRPC----------->|  Grafana (dashboards)
+OTel Trace Hook  --OTLP/HTTP----------->|  Grafana (dashboards)
 ```
 
 | Container | Image | Role |
@@ -43,7 +43,6 @@ Add an `env` block to your Claude Code settings file (`~/.claude/settings.json`)
     "OTEL_RESOURCE_ATTRIBUTES": "project.name=my-project",
     "OTEL_METRICS_EXPORTER": "otlp",
     "OTEL_LOGS_EXPORTER": "otlp",
-    "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT": "http://localhost:4320",
     "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4321",
     "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
     "OTEL_LOG_USER_PROMPTS": "1",
@@ -59,8 +58,7 @@ Add an `env` block to your Claude Code settings file (`~/.claude/settings.json`)
 | `OTEL_SERVICE_NAME` | Service identity label on all telemetry |
 | `OTEL_RESOURCE_ATTRIBUTES` | Comma-separated `key=value` pairs added to the OTel resource |
 | `OTEL_METRICS_EXPORTER` / `OTEL_LOGS_EXPORTER` | Must be `otlp` (default is `none`) |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | Collector HTTP endpoint (metrics + logs) |
-| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | Collector gRPC endpoint (traces via the OTel trace hook) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Collector HTTP endpoint (metrics, logs, and traces) |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | Transport protocol |
 | `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE` | Must be `cumulative` for Prometheus compatibility |
 | `OTEL_LOG_USER_PROMPTS` / `OTEL_LOG_TOOL_DETAILS` | Include prompt content and tool details in logs |
@@ -115,7 +113,7 @@ Also included but not shown: **API Requests**, **API Errors**, **Tool Usage**, a
 |-----------|---------|
 | 3001 | Grafana UI |
 | 4320 | OTel Collector gRPC |
-| 4321 | OTel Collector HTTP (Claude Code pushes here) |
+| 4321 | OTel Collector HTTP |
 | 9092 | Prometheus API |
 | 13133 | OTel Collector health check |
 | 4040 | Pyroscope UI |
