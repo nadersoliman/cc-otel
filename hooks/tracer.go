@@ -9,7 +9,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -23,18 +23,18 @@ func traceIDFromSession(sessionID string) trace.TraceID {
 	return tid
 }
 
-// initTracer sets up the OTel TracerProvider with OTLP gRPC exporter.
+// initTracer sets up the OTel TracerProvider with OTLP HTTP exporter.
 //
 // All configuration is read from standard OTel environment variables:
-//   - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT or OTEL_EXPORTER_OTLP_ENDPOINT (default: http://localhost:4317)
+//   - OTEL_EXPORTER_OTLP_ENDPOINT (default: http://localhost:4318)
 //   - OTEL_SERVICE_NAME (default: unknown_service)
 //   - OTEL_RESOURCE_ATTRIBUTES (default: none)
 func initTracer() (func(), error) {
 	ctx := context.Background()
 
-	exporter, err := otlptracegrpc.New(ctx,
-		otlptracegrpc.WithInsecure(),
-		otlptracegrpc.WithTimeout(5*time.Second),
+	exporter, err := otlptracehttp.New(ctx,
+		otlptracehttp.WithInsecure(),
+		otlptracehttp.WithTimeout(5*time.Second),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("create exporter: %w", err)
